@@ -1,0 +1,21 @@
+# Project specific
+/ostercard
+/coverage.html
+/coverage.out
+/main
+
+# OS
+.DS_Store
+*.tmp
+
+# IDE & editors
+.idea
+*.iml
+*~
+*.swp
+*.swo
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+out/
