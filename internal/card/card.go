@@ -1,42 +1,53 @@
 package card
 
-import "fmt"
+import (
+	"fmt"
 
-type card struct {
-	balance float32
+	"ostercard/internal/fare"
+	"ostercard/internal/journey"
+	"ostercard/internal/station"
+	"ostercard/internal/transport"
+)
+
+type Card struct {
+	Balance float64
+	Journey journey.Journey
 }
 
-type Card interface {
-	Balance() float32
-	HasSufficientBalance(fare float32) bool
-	Credit(fare float32)
-	Debit(fare float32) error
-}
+func (c *Card) Swipe(transport transport.Transport, stationName station.StationName) error {
+	if c.Journey.InTrip {
+		err := c.Journey.End(stationName)
+		if err != nil {
+			return err
+		}
 
-func New(balance float32) Card {
-	return &card{balance: balance}
-}
-
-func (c *card) Balance() float32 {
-	return c.balance
-}
-
-func (c *card) HasSufficientBalance(fare float32) bool {
-	if c.balance < fare {
-		return false
+		amount, err := fare.NewCalculator(c.Journey.Transport, station.GetZone(c.Journey.StartPoint),
+			station.GetZone(c.Journey.EndPoint)).ChargeAfterJourney()
+		if err != nil {
+			return err
+		}
+		c.Balance = c.Balance + amount
+		return nil
 	}
-	return true
-}
 
-func (c *card) Credit(fare float32) {
-	c.balance = c.balance + fare
-}
-
-func (c *card) Debit(fare float32) error {
-	hasSufficientBalance := c.HasSufficientBalance(fare)
+	err := c.Journey.Start(transport, stationName)
+	if err != nil {
+		return err
+	}
+	amount := fare.NewCalculator(c.Journey.Transport,
+		station.GetZone(c.Journey.StartPoint),
+		station.GetZone(c.Journey.EndPoint)).ChargeBeforeJourney(transport)
+	hasSufficientBalance := c.hasSufficientBalance(amount)
 	if !hasSufficientBalance {
 		return fmt.Errorf("insufficient balance")
 	}
-	c.balance = c.balance - fare
+	c.Balance = c.Balance - amount
 	return nil
+}
+
+func (c *Card) hasSufficientBalance(fare float64) bool {
+	if c.Balance < fare {
+		return false
+	}
+	return true
 }

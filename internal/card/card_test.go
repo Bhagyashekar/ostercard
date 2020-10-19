@@ -1,60 +1,32 @@
 package card_test
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"ostercard/internal/card"
+	"ostercard/internal/station"
+	"ostercard/internal/transport"
 )
 
-func TestBalance(t *testing.T) {
-	card := card.New(20.0)
+func TestSwipeToStartTrip(t *testing.T) {
+	card := card.Card{Balance: 30.0}
 
-	balance := card.Balance()
+	err := card.Swipe(transport.TUBE, station.HALBORN)
 
-	assert.Equal(t, float32(20.0), balance, "balance is not 20.0")
+	assert.Equal(t, float64(26.8), card.Balance, "balance is not 22.9")
+	assert.NoError(t, err)
 }
 
-func TestHasSufficientBalance(t *testing.T) {
-	card := card.New(20.0)
+func TestSwipeToEndTrip(t *testing.T) {
+	card := card.Card{Balance: 30.0}
+	err := card.Swipe(transport.TUBE, station.HALBORN)
+	require.NoError(t, err)
 
-	hasSufficientBalance := card.HasSufficientBalance(20.0)
+	err = card.Swipe(transport.TUBE, station.EARLSCOURT)
 
-	assert.True(t, hasSufficientBalance, "has sufficient balance is not true")
-}
-
-func TestHasSufficientBalanceWhenNoSufficientBalance(t *testing.T) {
-	card := card.New(20.0)
-
-	hasSufficientBalance := card.HasSufficientBalance(20.1)
-
-	assert.False(t, hasSufficientBalance, "has sufficient balance is not false")
-}
-
-func TestCredit(t *testing.T) {
-	card := card.New(20.0)
-
-	card.Credit(2.9)
-	balance := card.Balance()
-
-	assert.Equal(t, float32(22.9), balance, "balance is not 22.9")
-}
-
-func TestDebit(t *testing.T) {
-	card := card.New(20.0)
-
-	err := card.Debit(2.9)
-
-	assert.NoError(t, err, "expected no error while debit")
-	balance := card.Balance()
-	assert.Equal(t, float32(17.1), balance, "balance is not 17.1")
-}
-
-func TestDebitWhenInsufficientBalance(t *testing.T) {
-	card := card.New(20.0)
-
-	err := card.Debit(22.9)
-
-	assert.EqualError(t, err, "insufficient balance")
+	assert.NoError(t, err)
+	assert.Equal(t, float64(26.8), card.Balance, "balance is not 22.9")
 }

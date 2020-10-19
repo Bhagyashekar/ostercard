@@ -43,9 +43,3 @@ func TestValidate(t *testing.T) {
 	}
 }
 
-func TestZone(t *testing.T) {
-	stn := station.New()
-	stationZone := stn.Zone(station.EARLSCOURT)
-
-	assert.ElementsMatch(t, []int{1, 2}, stationZone, "station zone is not matching")
-}

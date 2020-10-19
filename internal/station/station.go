@@ -35,25 +35,19 @@ func Validate(name StationName) error {
 	return nil
 }
 
-type Station interface {
-	Zone(name StationName) Zone
-}
-
 type StationZone map[StationName]Zone
 
-type station struct {
-	StationZone
-}
+var stn StationZone
 
-func New() Station {
+func New() {
 	stationZone := make(StationZone)
 	stationZone[HALBORN] = []int{1}
 	stationZone[EARLSCOURT] = []int{1, 2}
 	stationZone[WIMBLENDON] = []int{3}
 	stationZone[HAMMERSMITH] = []int{2}
-	return &station{stationZone}
+	stn = stationZone
 }
 
-func (s *station) Zone(name StationName) Zone {
-	return s.StationZone[name]
+func GetZone(name StationName) Zone {
+	return stn[name]
 }

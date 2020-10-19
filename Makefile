@@ -23,7 +23,7 @@ test:
 	go tool cover -html coverage.out -o coverage.html
 	@coverage="$$(go tool cover -func coverage.out | grep 'total:' | awk '{print int($$3)}')"; \
 	echo "The overall coverage is $$coverage%. Look at coverage.html for details."; \
-	if [ $$coverage -lt 95 ]; then \
+	if [ $$coverage -lt 80 ]; then \
 		echo "The coverage $$coverage% is below the accepted threshold 70%."; \
 		exit 1; \
 	fi

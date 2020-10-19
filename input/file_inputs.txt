@@ -1,6 +1,0 @@
-start_trip Tube Holborn
-end_trip Earls_court
-start_trip Bus Earls_court
-end_trip Wimblendon
-start_trip Tube Earls_court
-end_trip Hammersmith
